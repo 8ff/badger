@@ -1,0 +1,57 @@
+# badger :badger:
+Badger is a lightweight alternative to systemd, it runs your scripts and manages your daemons at startup.
+
+
+### Features
+* Live reload of the daemons file allows your to add and remove daemons and scripts while system is running live
+* Automatically restarts failed daemons and stops removed daemons
+* Offers a simple replacement for an otherwise heavy init daemon like systemd.
+* Designed to be used with runc, systemd and serve as systemd replacement in docker containers
+* Properly reaps zombies
+* Follows KISS principle
+
+### initFile
+```
+s:/runMeOnce.sh param1
+d:/iAmDaemon.sh
+d:/usr/sbin/sshd -D
+```
+
+### Running
+
+#### Shell
+```bash
+./badger if /initFile log /log/badger.log
+```
+
+#### runC
+Place badger in /bin/badger inside `container/rootfs/bin/badger` and create the `container/rootfs/initFile` and log folder.
+runC config.json example:
+```json
+	"args": [
+		"/bin/badger if /initFile log /log/badger.log"
+	],
+```
+
+#### systemD
+Using badger to start your services on startup
+Add contents to `/etc/systemd/system/badger.service`
+```
+[Unit]
+Description=badger
+After=network.target
+
+[Service]
+ExecStart=/bin/badger if /initFile log /log/badger.log
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+Alias=badger.service
+```
+
+Then run:
+```bash
+systemctl enable badger
+systemctl start badger
+```
