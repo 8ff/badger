@@ -1,4 +1,6 @@
-# badger :badger:
+# badger
+![logo](media/badger.svg)
+
 Badger is a lightweight alternative to systemd, it runs your scripts and manages your daemons at startup.
 
 
