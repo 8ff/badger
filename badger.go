@@ -84,7 +84,7 @@ func (wa *wa) coordinator() {
 				daemons = append(daemons, line)
 				if !sliceHas_string(executed, line) {
 					// For single run command there is no need to cancel context
-					go executor(cmdParam, nil, false)
+					go executor(cmdParam, context.Background(), false)
 					executed = append(executed, line)
 				}
 
