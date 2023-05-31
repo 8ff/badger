@@ -13,20 +13,23 @@ import (
 
 var VERSION string
 
-type wa struct {
-	config config
-}
-
-type config struct {
-	initFile string
-	logFile  string
-}
+var initFile string
+var logFile string
 
 func tlog(logType string, logData string) {
 	if logType == "error" {
 		fmt.Fprintf(os.Stderr, "%s [%s]% -s %s\n", time.Now().Format("02/01/2006_15:04:05.000000"), logType, "", logData)
 	} else {
 		fmt.Printf("%s [%s]% -s %s\n", time.Now().Format("02/01/2006_15:04:05.000000"), logType, "", logData)
+	}
+
+	if logFile != "" {
+		f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			tlog("error", fmt.Sprintf("%s", err))
+		}
+		defer f.Close()
+		fmt.Fprintf(f, "%s [%s]% -s %s\n", time.Now().Format("02/01/2006_15:04:05.000000"), logType, "", logData)
 	}
 }
 
@@ -43,13 +46,13 @@ func removeByIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
 
-func (wa *wa) coordinator() {
+func coordinator() {
 	dmap := make(map[string]context.CancelFunc)
 	executed := make([]string, 0)
 
 	for {
 		daemons := make([]string, 0)
-		content, err := os.ReadFile(wa.config.initFile)
+		content, err := os.ReadFile(initFile)
 		if err != nil {
 			tlog("error", fmt.Sprintf("%s", err))
 			os.Exit(3)
@@ -166,7 +169,7 @@ func getSignal() {
 	}
 }
 
-func (wa *wa) handleArgs() {
+func handleArgs() {
 	args := os.Args[1:]
 
 	for i := 0; i < len(args); i++ {
@@ -195,13 +198,13 @@ func (wa *wa) handleArgs() {
 
 		case "if":
 			if i+1 < len(args) {
-				wa.config.initFile = args[i+1]
+				initFile = args[i+1]
 				i++
 			}
 
 		case "log":
 			if i+1 < len(args) {
-				wa.config.logFile = args[i+1]
+				logFile = args[i+1]
 				i++
 			}
 		}
@@ -209,12 +212,11 @@ func (wa *wa) handleArgs() {
 }
 
 func main() {
-	wa := wa{}
 
-	wa.config.initFile = "/opt/runtime/if"
-	wa.config.logFile = "/opt/runtime/log/init.log"
-	wa.handleArgs()
+	initFile = "/opt/runtime/if"
+	logFile = "/opt/runtime/log/init.log"
+	handleArgs()
 
 	go getSignal()
-	wa.coordinator()
+	coordinator()
 }
