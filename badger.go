@@ -224,6 +224,9 @@ func main() {
 
 	handleArgs()
 
+	tlog("info", fmt.Sprintf("Initfile: %s", initFile))
+	tlog("info", fmt.Sprintf("Logfile: %s", logFile))
+	tlog("info", fmt.Sprintf("PID: %d", os.Getpid()))
 	go getSignal()
 	coordinator()
 }
