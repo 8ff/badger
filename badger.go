@@ -212,9 +212,16 @@ func handleArgs() {
 }
 
 func main() {
-
+	// Defaults
 	initFile = "/opt/runtime/if"
 	logFile = "/opt/runtime/log/init.log"
+
+	// Check if binary name is /sbin/init then set initFile to /initrc and log file to /init.log
+	if strings.HasSuffix(os.Args[0], "/sbin/init") {
+		initFile = "/initrc"
+		logFile = "/init.log"
+	}
+
 	handleArgs()
 
 	go getSignal()
