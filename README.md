@@ -20,6 +20,10 @@ d:/usr/sbin/sshd -D
 ```
 
 ### Running
+#### Using inplace of `/sbin/init`
+`badger` can be used inplace of `/sbin/init`, for example when using microvms.
+In those cases as no arguments are passed it will read config from `/initrc` and write log to `init.log`
+
 
 #### Shell
 ```bash
