@@ -11,6 +11,7 @@ jobs:
         RELEASE_NAME: Latest release
         RELEASE_BODY: Latest release
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BINARY_PREFIX: ${{ github.event.repository.name }}
       steps:
         - name: Checkout the repository
           uses: actions/checkout@v2
@@ -25,21 +26,18 @@ jobs:
   
         - name: Download releaseMaker
           run: wget https://github.com/8ff/releaseMaker/releases/download/latest/releaseMaker.linux.amd64 -O /tmp/releaseMaker && chmod +x /tmp/releaseMaker
-
-        - name: Set binary prefix
-          run: binaryPrefix=${{ github.event.repository.name }}
         
         - name: Build Darwin ARM64 binary
-          run: GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${binaryPrefix}.darwin.arm64"
+          run: GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.RELEASE_NAME }}.darwin.arm64"
         
         - name: Build Darwin AMD64 binary
-          run: GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${binaryPrefix}.darwin.amd64"
+          run: GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.RELEASE_NAME }}.darwin.amd64"
         
         - name: Build Linux ARM64 binary
-          run: GOOS=linux GOARCH=arm64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${binaryPrefix}.linux.arm64"
+          run: GOOS=linux GOARCH=arm64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.RELEASE_NAME }}.linux.arm64"
         
         - name: Build Linux AMD64 binary
-          run: GOOS=linux GOARCH=amd64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${binaryPrefix}.linux.amd64"
+          run: GOOS=linux GOARCH=amd64 go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.RELEASE_NAME }}.linux.amd64"
         
 
         - name: Replace Existing Release
