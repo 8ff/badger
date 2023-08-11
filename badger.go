@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var VERSION string
+var Version string
 
 var initFile string
 var logFile string
