@@ -6,9 +6,12 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/8ff/tuna"
 )
 
 var Version string
@@ -24,6 +27,11 @@ func tlog(logType string, logData string) {
 	}
 
 	if logFile != "" {
+		// Check if log file exists, if not create it along with the path
+		if _, err := os.Stat(logFile); os.IsNotExist(err) {
+			os.MkdirAll(logFile, 0755)
+		}
+
 		f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			tlog("error", fmt.Sprintf("%s", err))
@@ -175,11 +183,18 @@ func handleArgs() {
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "update":
-			// e := tuna.SelfUpdate("https://releases/badger")
-			// if e != nil {
-			// 	tlog("error", e.Error())
-			// }
-			// tlog("info", "Updated to latest version!")
+			// Determine OS and ARCH
+			osRelease := runtime.GOOS
+			arch := runtime.GOARCH
+
+			// Build URL
+			e := tuna.SelfUpdate(fmt.Sprintf("https://github.com/8ff/badger/releases/download/latest/badger.%s.%s", osRelease, arch))
+			if e != nil {
+				fmt.Println(e)
+				os.Exit(1)
+			}
+
+			fmt.Println("Updated!")
 			os.Exit(0)
 
 		case "version", "-v", "--version":

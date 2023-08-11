@@ -3,7 +3,6 @@
 
 Badger is a lightweight alternative to systemd, it runs your scripts and manages your daemons at startup.
 
-
 ### Features
 * Live reload of the daemons file allows your to add and remove daemons and scripts while system is running live
 * Automatically restarts failed daemons and stops removed daemons
@@ -60,4 +59,9 @@ Then run:
 ```bash
 systemctl enable badger
 systemctl start badger
+```
+
+## Installing
+```bash
+repo="badger"; name="badger"; os=$(uname | tr '[:upper:]' '[:lower:]'); arch=$(uname -m); case $arch in x86_64) arch="amd64" ;; arm64) arch="arm64" ;; esac; url="https://github.com/8ff/${repo}/releases/download/latest/${name}.${os}.${arch}"; curl -L $url -o ${name} && chmod +x ${name}
 ```
