@@ -29,12 +29,17 @@ func tlog(logType string, logData string) {
 	if logFile != "" {
 		// Check if log file exists, if not create it along with the path
 		if _, err := os.Stat(logFile); os.IsNotExist(err) {
-			os.MkdirAll(logFile, 0755)
+			err := os.MkdirAll(logFile, 0755)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error: cannot create log file path: %s\n", err)
+				os.Exit(4)
+			}
 		}
 
 		f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			tlog("error", fmt.Sprintf("%s", err))
+			fmt.Fprintf(os.Stderr, "error: cannot open log file: %s\n", err)
+			os.Exit(4)
 		}
 		defer f.Close()
 		fmt.Fprintf(f, "%s [%s]% -s %s\n", time.Now().Format("02/01/2006_15:04:05.000000"), logType, "", logData)
@@ -197,8 +202,8 @@ func handleArgs() {
 			fmt.Println("Updated!")
 			os.Exit(0)
 
-		case "version", "-v", "--version":
-			fmt.Fprintf(os.Stdout, "%s\n", "VERSION")
+		case "version", "v", "-v", "--version":
+			fmt.Fprintf(os.Stdout, "%s\n", "VERSION: "+Version)
 			os.Exit(0)
 
 		case "help", "h", "-h", "--help":
