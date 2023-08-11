@@ -46,7 +46,6 @@ jobs:
         - name: Upload the artifacts
           run: |
             cd /tmp/build
-            ls -la
             for file in *; do
               /tmp/releaseMaker upload ${{ github.repository }} ${{ env.TAG }} $file $file
             done
