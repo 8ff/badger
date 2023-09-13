@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -27,9 +28,13 @@ func tlog(logType string, logData string) {
 	}
 
 	if logFile != "" {
-		// Check if log file exists, if not create it along with the path
-		if _, err := os.Stat(logFile); os.IsNotExist(err) {
-			err := os.MkdirAll(logFile, 0755)
+		// Extract directory from the full path
+		dir := filepath.Dir(logFile)
+
+		// Check if directory exists
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			// Create directory
+			err := os.MkdirAll(dir, 0755)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error: cannot create log file path: %s\n", err)
 				os.Exit(4)
