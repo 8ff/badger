@@ -53,20 +53,6 @@ jobs:
           ARCH: amd64
         run: GOOS=$OS GOARCH=$ARCH go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.BINARY_PREFIX }}.$OS.$ARCH"
 
-      - name: Build Windows AMD64 binary
-        working-directory: ${{ env.SOURCE_PATH }}
-        env:
-          OS: windows
-          ARCH: amd64
-        run: GOOS=$OS GOARCH=$ARCH go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.BINARY_PREFIX }}.$OS.$ARCH.exe"
-
-      - name: Build Windows ARM64 binary
-        working-directory: ${{ env.SOURCE_PATH }}
-        env:
-          OS: windows
-          ARCH: arm64
-        run: GOOS=$OS GOARCH=$ARCH go build -ldflags "-X 'main.Version=$(date +'%Y-%m-%d_%H:%M:%S')'" -o "/tmp/build/${{ env.BINARY_PREFIX }}.$OS.$ARCH.exe"
-
       - name: Build OpenBSD AMD64 binary
         working-directory: ${{ env.SOURCE_PATH }}
         env:
