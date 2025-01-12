@@ -143,23 +143,37 @@ func coordinator() {
 }
 
 func executor(d string, ctx context.Context, daemon bool) {
-	for {
-		tlog("info", fmt.Sprintf("[%s] => [STARTED]", d))
-		out, err := exec.CommandContext(ctx, "/bin/bash", "-u", "-o", "pipefail", "-c", d).Output()
-		if err != nil {
-			tlog("error", fmt.Sprintf("[%s] => [KILLED] | [%s] %s", d, err, out))
-			if ctx.Err() != nil {
-				if ctx.Err().Error() == "context canceled" {
-					return
-				}
-			}
-		}
-		if !daemon {
-			return
-		}
-		tlog("info", fmt.Sprintf("[%s] => [EXITED]", d))
-		time.Sleep(3 * time.Second)
-	}
+    // Determine shell and args
+    shellCmd := "/bin/sh"
+    shellArgs := []string{"-c"}
+    
+    // Check for bash and use it if available
+    if _, err := os.Stat("/bin/bash"); err == nil {
+        shellCmd = "/bin/bash"
+        shellArgs = []string{"-u", "-o", "pipefail", "-c"}
+    } else if _, err := os.Stat("/usr/local/bin/bash"); err == nil {
+        // Check FreeBSD common bash location
+        shellCmd = "/usr/local/bin/bash"
+        shellArgs = []string{"-u", "-o", "pipefail", "-c"}
+    }
+    
+    for {
+        tlog("info", fmt.Sprintf("[%s] => [STARTED]", d))
+        out, err := exec.CommandContext(ctx, shellCmd, append(shellArgs, d)...).Output()
+        if err != nil {
+            tlog("error", fmt.Sprintf("[%s] => [KILLED] | [%s] %s", d, err, out))
+            if ctx.Err() != nil {
+                if ctx.Err().Error() == "context canceled" {
+                    return
+                }
+            }
+        }
+        if !daemon {
+            return
+        }
+        tlog("info", fmt.Sprintf("[%s] => [EXITED]", d))
+        time.Sleep(3 * time.Second)
+    }
 }
 
 func getSignal() {
